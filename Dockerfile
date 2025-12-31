@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     vim \
     build-essential \
     locales \
+    rsync \
     && rm -rf /var/lib/apt/lists/*
 
 # 生成常用 Locale
@@ -22,10 +23,14 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
     sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
     sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 
+# 将 root 的家目录更改为 /app，以便利用 Volume 持久化所有配置
+RUN usermod -d /app root
+
 # 复制并准备启动脚本
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+WORKDIR /app
 EXPOSE 22
 
 # 使用脚本作为入口点
