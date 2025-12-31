@@ -1,17 +1,22 @@
 FROM debian:stable-slim
 
-# 安装基础开发工具，按需增减
 RUN apt-get update && apt-get install -y \
-    curl \
-    git \
-    vim \
-    wget \
-    build-essential \
+    openssh-server \
     && rm -rf /var/lib/apt/lists/*
 
-# 设置工作目录
-WORKDIR /app
+RUN mkdir -p /var/run/sshd
 
-# 保持容器运行（开发环境常用技巧）
-CMD ["tail", "-f", "/dev/null"]
+# 基础 SSH 配置
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
+    sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+
+# 复制并准备启动脚本
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 22
+
+# 使用脚本作为入口点
+ENTRYPOINT ["/entrypoint.sh"]
 
