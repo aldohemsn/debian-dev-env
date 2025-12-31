@@ -1,0 +1,54 @@
+# --- Common OS and Editor Generated Files ---
+.DS_Store
+.vscode/
+
+# --- Shell History & Config ---
+.bash_history
+.bash_profile
+.bashrc
+.profile
+.zsh_history
+.zshrc
+.p10k.zsh
+.lesshst
+.viminfo
+.gitconfig
+
+# --- SSH Related Files ---
+.ssh/
+.gnupg/
+.local/share/gnupg/
+
+# --- VS Code Remote / Antigravity Server ---
+.vscode-server/
+.antigravity-server/
+.vscodium-server/
+
+# --- npm / Node.js related ---
+.npm/
+.yarn/
+node_modules/
+
+# --- Python related ---
+__pycache__/
+.python_history
+.ipynb_checkpoints/
+.venv/
+venv/
+pip-log.txt
+.mypy_cache/
+
+# --- Cache and Temp Directories ---
+.cache/
+.local/share/
+.config/
+tmp/
+*.tmp
+*.log
+*.swp
+*.swo
+
+# --- Railway/Docker related ---
+.env # If you use .env files for local development
+Dockerfile.bak
+entrypoint.sh.bak
