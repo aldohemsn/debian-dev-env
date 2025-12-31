@@ -24,7 +24,8 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
     sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 
 # 将 root 的家目录更改为 /app，以便利用 Volume 持久化所有配置
-RUN usermod -d /app root
+# 直接修改 /etc/passwd 避免 usermod "user is currently used by process 1" 错误
+RUN sed -i 's|root:/root|root:/app|' /etc/passwd
 
 # 复制并准备启动脚本
 COPY entrypoint.sh /entrypoint.sh
