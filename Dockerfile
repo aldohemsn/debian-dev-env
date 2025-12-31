@@ -7,7 +7,13 @@ RUN apt-get update && apt-get install -y \
     git \
     vim \
     build-essential \
+    locales \
     && rm -rf /var/lib/apt/lists/*
+
+# 生成常用 Locale
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+    sed -i '/zh_CN.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen
 
 RUN mkdir -p /var/run/sshd
 
