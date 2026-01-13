@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     htop \
     jq \
+    tmux \
     && rm -rf /var/lib/apt/lists/*
 
 # 2. 设置 Locale (中文支持)
