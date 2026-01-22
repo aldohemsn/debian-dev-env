@@ -7,6 +7,20 @@ if [ ! -f "/app/.bashrc" ]; then
     cp -r /etc/skel/. /app/
 fi
 
+# 确保 .bashrc 中包含正确的 locale 设置（修复 Mac 终端发送错误 LC_CTYPE 的问题）
+LOCALE_MARKER="# Locale settings for Chinese support"
+if ! grep -q "$LOCALE_MARKER" /app/.bashrc 2>/dev/null; then
+    cat >> /app/.bashrc << 'EOF'
+
+# Locale settings for Chinese support
+# 修复 Mac 终端发送 LC_CTYPE=UTF-8 导致的警告
+export LANG=zh_CN.UTF-8
+export LANGUAGE=zh_CN:zh
+export LC_ALL=zh_CN.UTF-8
+EOF
+    echo "已添加 locale 配置到 .bashrc"
+fi
+
 # 检查环境变量是否存在
 if [ -n "$SSH_PUB_KEY" ]; then
     mkdir -p /app/.ssh

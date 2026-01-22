@@ -27,6 +27,16 @@ RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
     sed -i '/zh_CN.UTF-8/s/^# //g' /etc/locale.gen && \
     locale-gen
 
+# 设置默认 Locale 环境变量
+ENV LANG=zh_CN.UTF-8 \
+    LANGUAGE=zh_CN:zh \
+    LC_ALL=zh_CN.UTF-8
+
+# 写入 /etc/default/locale 确保系统级别生效
+RUN echo 'LANG=zh_CN.UTF-8' > /etc/default/locale && \
+    echo 'LANGUAGE=zh_CN:zh' >> /etc/default/locale && \
+    echo 'LC_ALL=zh_CN.UTF-8' >> /etc/default/locale
+
 # 3. 安装中文字体
 RUN apt-get update && apt-get install -y \
     fonts-noto-cjk \
@@ -63,7 +73,9 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN mkdir -p /var/run/sshd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
-    sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+    sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
+    # 禁止接受客户端发送的 locale 变量（修复 Mac 终端发送 LC_CTYPE=UTF-8 的问题）
+    sed -i 's/^AcceptEnv LANG LC_\*/#AcceptEnv LANG LC_*/' /etc/ssh/sshd_config
 
 # 8. 用户与目录配置
 # 将 root 的家目录更改为 /app，以便利用 Volume 持久化所有配置
