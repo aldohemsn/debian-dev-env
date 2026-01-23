@@ -35,5 +35,12 @@ fi
 # 确保 /app 归 root 所有（防止挂载卷权限问题）
 chown -R root:root /app/.ssh
 
-# 启动 SSH 服务
+# 确保文件服务目录存在
+mkdir -p /app/files
+
+# 启动 Caddy 文件服务器（后台运行）
+echo "启动 Caddy 文件服务器..."
+caddy start --config /etc/caddy/Caddyfile
+
+# 启动 SSH 服务（前台运行，保持容器存活）
 exec /usr/sbin/sshd -D

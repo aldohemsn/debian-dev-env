@@ -1,0 +1,8 @@
+# Caddy 文件服务器配置
+# 监听 8081 端口，Railway 会自动处理 HTTPS
+
+:8081 {
+    # 文件浏览服务 - 根路径直接访问
+    root * /app/files
+    file_server browse
+}

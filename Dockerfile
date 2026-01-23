@@ -69,7 +69,16 @@ RUN corepack enable
 # PHP: 安装 Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# 7. SSH 服务配置
+# 7. 安装 Caddy Web 服务器
+RUN curl -fsSL https://dl.cloudsmith.io/public/caddy/stable/gpg.key | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/caddy-stable-archive-keyring.gpg] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main" > /etc/apt/sources.list.d/caddy-stable.list && \
+    apt-get update && apt-get install -y caddy && \
+    rm -rf /var/lib/apt/lists/*
+
+# 复制 Caddy 配置文件
+COPY Caddyfile /etc/caddy/Caddyfile
+
+# 8. SSH 服务配置
 RUN mkdir -p /var/run/sshd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config && \
@@ -77,7 +86,7 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
     # 禁止接受客户端发送的 locale 变量（修复 Mac 终端发送 LC_CTYPE=UTF-8 的问题）
     sed -i 's/^AcceptEnv LANG LC_\*/#AcceptEnv LANG LC_*/' /etc/ssh/sshd_config
 
-# 8. 用户与目录配置
+# 9. 用户与目录配置
 # 将 root 的家目录更改为 /app，以便利用 Volume 持久化所有配置
 # 直接修改 /etc/passwd 避免 usermod "process 1" 错误
 RUN sed -i 's|root:/root|root:/app|' /etc/passwd
@@ -86,9 +95,12 @@ RUN sed -i 's|root:/root|root:/app|' /etc/passwd
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# 创建文件服务目录
+RUN mkdir -p /app/files
+
 # 默认进入 /app
 WORKDIR /app
-EXPOSE 22
+EXPOSE 22 8081
 
 # 使用脚本作为入口点
 ENTRYPOINT ["/entrypoint.sh"]
